@@ -1,0 +1,153 @@
+import math
+
+produtos = []
+lucro = 0
+
+categorias = ["Frios", "Massas", "Bebidas", "Limpeza", "Higiene", "Doces"]
+
+
+def buscar(tipo):
+    for p in produtos:
+        if p["tipo"].lower() == tipo.lower():
+            return p
+    return None
+
+
+def escolher_categoria():
+    print("\nCategorias disponíveis:")
+    for i, c in enumerate(categorias):
+        print(i + 1, "-", c)
+    print(len(categorias) + 1, "- Outros")
+
+    escolha = int(input("Escolha a categoria: "))
+
+    if escolha == len(categorias) + 1:
+        nova = input("Nova categoria: ")
+        categorias.append(nova)
+        return nova
+    else:
+        return categorias[escolha - 1]
+
+
+def adicionar():
+    while True:
+        print("\n--- ADICIONAR PRODUTO ---")
+
+        tipo = input("Tipo do produto: ")
+        marca = input("Marca: ")
+        categoria = escolher_categoria()
+
+        preco_venda = float(input("Preço de venda: ").replace(",", "."))
+        preco_custo = float(input("Preço de custo: ").replace(",", "."))
+        quantidade = int(input("Quantidade: "))
+
+        existente = buscar(tipo)
+
+        if existente:
+            existente["quantidade"] += quantidade
+            print("Produto já existente. Quantidade somada!")
+        else:
+            produtos.append({
+                "tipo": tipo,
+                "marca": marca,
+                "categoria": categoria,
+                "preco_venda": preco_venda,
+                "preco_custo": preco_custo,
+                "quantidade": quantidade,
+                "vendidos": 0
+            })
+            print("Produto cadastrado!")
+
+        if input("Adicionar outro? (S/N): ").lower() != "s":
+            break
+
+
+def vender():
+    global lucro
+
+    p = buscar(input("Tipo do produto: "))
+
+    if p:
+        q = int(input("Quantidade vendida: "))
+
+        if q <= p["quantidade"]:
+            p["quantidade"] -= q
+            p["vendidos"] += q
+            lucro += q * (p["preco_venda"] - p["preco_custo"])
+            print("Venda realizada!")
+        else:
+            print("Estoque insuficiente!")
+    else:
+        print("Produto não encontrado!")
+
+
+# =========================
+# ESTOQUE EM LINHAS (BONITO)
+# =========================
+
+def listar():
+    print("\n==============================")
+    print("        ESTOQUE ATUAL")
+    print("==============================")
+
+    if not produtos:
+        print("Nenhum produto cadastrado.")
+        return
+
+    for i, p in enumerate(produtos, start=1):
+        print("\n------------------------------")
+        print("Produto:", i)
+        print("Tipo:", p["tipo"])
+        print("Marca:", p["marca"])
+        print("Categoria:", p["categoria"])
+        print("Preço venda: R$", p["preco_venda"])
+        print("Preço custo: R$", p["preco_custo"])
+        print("Quantidade:", p["quantidade"])
+        print("Vendidos:", p["vendidos"])
+    print("\n===============================")
+
+
+def relatorio():
+    if produtos:
+        mais = max(produtos, key=lambda x: x["vendidos"])
+        menos = min(produtos, key=lambda x: x["vendidos"])
+
+        print("\n--- RELATÓRIO ---")
+        print("Mais vendido:", mais["tipo"], "|", mais["vendidos"])
+        print("Menos vendido:", menos["tipo"], "|", menos["vendidos"])
+
+
+def mostrar_lucro():
+    print("\nLucro do dia:", lucro)
+
+
+while True:
+    print("\n==============================")
+    print("      SISTEMA DE ESTOQUE")
+    print("==============================")
+    print("1 - Adicionar produto")
+    print("2 - Vender produto")
+    print("3 - Listar estoque")
+    print("4 - Relatório")
+    print("5 - Lucro do dia")
+    print("0 - Sair")
+    print("==============================")
+
+    op = input("Escolha: ")
+
+    if op == "1":
+        adicionar()
+    elif op == "2":
+        vender()
+    elif op == "3":
+        listar()
+    elif op == "4":
+        relatorio()
+    elif op == "5":
+        mostrar_lucro()
+    elif op == "0":
+        print("Encerrando sistema...")
+        break
+    else:
+        print("Opção inválida!")
+        
